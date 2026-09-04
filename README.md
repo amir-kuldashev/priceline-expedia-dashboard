@@ -1,4 +1,4 @@
-# Drivo OTA Review Dashboard
+# Priceline & Expedia Dashboard
 
 Live dashboard of Expedia and Priceline review sentiment per check-out agent,
 grouped by location and filterable by month.

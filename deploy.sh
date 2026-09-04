@@ -10,7 +10,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-SCRIPT_NAME="drivo-review-dashboard"
+SCRIPT_NAME="priceline-expedia-dashboard"
 API="https://api.cloudflare.com/client/v4"
 
 [ -f .cloudflare.env ] && source .cloudflare.env

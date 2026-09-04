@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Agent Review Scoreboard</title>
+<title>Priceline & Expedia Dashboard</title>
 <style>
 :root {
   color-scheme: light;
@@ -207,8 +207,8 @@ table.data td.negc { color: var(--neg); font-weight: 600; }
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Drivo · OTA Reviews</div>
-    <h1>Agent Review Scoreboard</h1>
+    <div class="eyebrow">Drivo · Priceline &amp; Expedia</div>
+    <h1>Priceline &amp; Expedia Dashboard</h1>
     <p class="sub"><span id="subline">Loading the latest reviews from Google Sheets…</span>
       <span class="stamp" id="stamp" hidden><span class="pulse"></span><span id="stampText"></span></span>
     </p>
@@ -265,7 +265,7 @@ table.data td.negc { color: var(--neg); font-weight: 600; }
 <div id="tooltip" role="tooltip"></div>
 
 <script>
-const DATA_URL = "https://drivo-review-dashboard.amirkuldashevstudy.workers.dev/data";
+const DATA_URL = "https://priceline-expedia-dashboard.amirkuldashevstudy.workers.dev/data";
 const REFRESH_MS = 5 * 60 * 1000;
 const UNASSIGNED = "(Unassigned)";
 const MONTH_NUM = { JANUARY:1, FEBRUARY:2, MARCH:3, APRIL:4, MAY:5, JUNE:6, JULY:7, AUGUST:8, SEPTEMBER:9, OCTOBER:10, NOVEMBER:11, DECEMBER:12 };

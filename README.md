@@ -18,7 +18,8 @@ grouped by location, filterable by any date range and by one or several location
   legacy `/data` keeps returning `YYYY-MM` month keys for older copies of the page.
 - Design follows the Drivo brand palette (Navy `#091365`, Baby Blue `#0D1CA4`,
   Yellow `#F3BB04`, White `#FBFBFB`, Black `#121212`). Sentiment colours:
-  positive = Baby Blue, neutral = Yellow, negative = Black.
+  positive = Baby Blue, neutral = cool grey `#AEB4CF`, negative = red `#D94452`
+  (Yellow and Black are reserved for accents and text).
 
 ## Not in the repo (gitignored)
 

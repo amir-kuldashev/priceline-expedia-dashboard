@@ -17,22 +17,23 @@
   --white: #fbfbfb;      /* White */
   --black: #121212;      /* Black */
 
-  --page: var(--white);
+  --page: #f3f4fa;
   --surface: #ffffff;
   --ink: var(--black);
   --ink-2: #3c4066;
   --muted: #7c809a;
   --grid: #e8e9f1;
   --baseline: #c9cbdc;
-  --ring: rgba(9, 19, 101, 0.14);
-  --pos: var(--blue);
-  --neu: #aeb4cf;         /* cool grey, neutral 3★ */
-  --neg: #d94452;         /* red, negative 1–2★ */
+  --ring: rgba(9, 19, 101, 0.09);
+  --pos: #2f43d6;         /* positive 4–5★ · brand blue, lifted for the bars */
+  --neu: #d9dcf0;         /* neutral 3★ · pale blue-grey */
+  --neg: #f28b7d;         /* negative 1–2★ · coral */
   --accent: var(--blue);
   --wash: rgba(13, 28, 164, 0.07);
   --delta-good: var(--blue);
-  --delta-bad: #c43a47;
-  --shadow: 0 10px 30px rgba(9, 19, 101, 0.14);
+  --delta-bad: #d9534f;
+  --shadow: 0 8px 24px rgba(9, 19, 101, 0.08);
+  --card-shadow: 0 1px 2px rgba(9, 19, 101, 0.06), 0 8px 24px rgba(9, 19, 101, 0.05);
 }
 * { box-sizing: border-box; }
 body {
@@ -46,7 +47,7 @@ body {
 /* ---------- hero header (Blue Gradient #091365 → #0D1CA4) ---------- */
 .hero {
   background: linear-gradient(120deg, var(--navy) 0%, var(--blue) 100%);
-  color: #fff; border-radius: 16px; padding: 26px 30px 24px; margin-bottom: 18px;
+  color: #fff; border-radius: 20px; padding: 26px 30px 24px; margin-bottom: 18px;
   position: relative; overflow: hidden;
 }
 .hero::after {
@@ -174,7 +175,7 @@ label.chk input { accent-color: var(--accent); }
 /* ---------- tiles ---------- */
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .tile {
-  background: var(--surface); border: 1px solid var(--ring); border-radius: 12px;
+  background: var(--surface); border: 0; box-shadow: var(--card-shadow); border-radius: 12px;
   padding: 14px 16px;
 }
 .tile .k {
@@ -187,7 +188,7 @@ label.chk input { accent-color: var(--accent); }
 
 /* ---------- card + chart ---------- */
 .card {
-  background: var(--surface); border: 1px solid var(--ring); border-radius: 14px;
+  background: var(--surface); border: 0; box-shadow: var(--card-shadow); border-radius: 14px;
   padding: 18px 20px;
 }
 .card + .card { margin-top: 16px; }
@@ -217,7 +218,7 @@ table.data tr.grp td {
 }
 .row {
   display: grid; grid-template-columns: 200px 1fr 52px 56px; gap: 12px;
-  align-items: center; padding: 5px 6px; border-radius: 8px;
+  align-items: center; padding: 7px 6px; border-radius: 8px;
 }
 .row:hover { background: var(--wash); }
 .row .name {
@@ -230,16 +231,19 @@ table.data tr.grp td {
 .net.up { color: var(--delta-good); }
 .net.down { color: var(--delta-bad); }
 .net.flat { color: var(--muted); }
-.bar { display: flex; height: 20px; align-items: stretch; border-left: 2px solid var(--baseline); padding-left: 1px; }
+.bar { display: flex; height: 14px; align-items: stretch; }
 .segp { display: flex; min-width: 0; }
 .seg-fill {
   flex: 1; display: flex; align-items: center; justify-content: center;
-  font-size: 10.5px; font-weight: 600; color: #fff; overflow: hidden;
+  font-size: 10px; font-weight: 600; color: #fff; overflow: hidden;
   white-space: nowrap;
 }
 .segp + .segp { margin-left: 2px; }
-.segp:last-child .seg-fill { border-radius: 0 4px 4px 0; }
+.segp:first-child .seg-fill { border-radius: 7px 0 0 7px; }
+.segp:last-child .seg-fill { border-radius: 0 7px 7px 0; }
+.segp:only-child .seg-fill { border-radius: 7px; }
 .seg-fill.neu-fill { color: var(--navy); }
+.seg-fill.neg-fill { color: #5a1a14; }
 .segp:hover .seg-fill { filter: brightness(1.15); }
 .empty { color: var(--muted); font-size: 13px; padding: 12px 6px; }
 
@@ -269,6 +273,7 @@ table.data td.negc { color: var(--delta-bad); font-weight: 600; }
 @media (max-width: 640px) {
   .hero { padding: 20px 18px; border-radius: 12px; }
   .row { grid-template-columns: 110px 1fr 40px 48px; }
+  .tiles { grid-template-columns: repeat(2, 1fr); }
   .spacer { margin-left: 0; }
   .pop { position: fixed; left: 16px; right: 16px; top: auto; bottom: 16px; }
 }
@@ -651,14 +656,14 @@ function segsHtml(counts, loc, agent) {
     .filter(([, i]) => counts[i] > 0)
     .map(([cls, i]) =>
       `<div class="segp" style="flex:${counts[i]} 0 0" data-loc="${esc(loc)}" data-key="${esc(agent)}">
-         <div class="seg-fill ${cls === "neu" ? "neu-fill" : ""}" style="background:var(--${cls})" data-count="${counts[i]}"></div>
+         <div class="seg-fill ${cls}-fill" style="background:var(--${cls})" data-count="${counts[i]}"></div>
        </div>`).join("");
 }
 
 function labelSegs(container) {
   requestAnimationFrame(() => {
     container.querySelectorAll(".seg-fill").forEach(s => {
-      s.textContent = s.offsetWidth >= 30 ? fmt(+s.dataset.count) : "";
+      s.textContent = s.dataset.count && s.offsetWidth >= 30 ? fmt(+s.dataset.count) : "";
     });
   });
 }
@@ -698,11 +703,12 @@ function renderChart(groups) {
       ? `<div class="grp-head"><span class="grp-name">${esc(g.loc)}</span><span class="grp-sum">${fmt(g.total)} reviews · ${pct(g.t[0], g.total)}% positive · ${pct(g.t[2], g.total)}% negative · net <b class="net ${netCls(g.t[0] - g.t[2])}">${fmtNet(g.t[0] - g.t[2])}</b></span></div>`
       : "";
     return head + g.agents.map(a => {
-      const w = state.mode === "share" ? 100 : (a.total / max * 100);
       const net = a.c[0] - a.c[2];
+      const w = state.mode === "share" ? 100 : (a.total / max * 100);
+      const bar = `<div style="display:flex;width:${w}%">${segsHtml(a.c, g.loc, a.name)}</div>`;
       return `<div class="row">
         <div class="name ${a.name === UNASSIGNED ? "unassigned" : ""}" title="${esc(a.name)}">${esc(a.name)}</div>
-        <div class="bar"><div style="display:flex;width:${w}%">${segsHtml(a.c, g.loc, a.name)}</div></div>
+        <div class="bar">${bar}</div>
         <div class="total">${fmt(a.total)}</div>
         <div class="net ${netCls(net)}" title="positive − negative">${fmtNet(net)}</div>
       </div>`;

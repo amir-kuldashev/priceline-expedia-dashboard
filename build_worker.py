@@ -8,7 +8,8 @@ Inputs:
   sheet_url.txt     - the private Google Sheet CSV URL (gitignored!)
 
 The sheet URL and raw CSV never reach the browser: /data returns only
-[source, sentiment-bucket, agent, location, month] tuples, with CORS open so
+[source, sentiment-bucket, agent, location, date] tuples
+(/data?v=2 gives "YYYY-MM-DD"; the legacy /data gives "YYYY-MM"), with CORS open so
 the GitHub Pages copy of the dashboard can read it too.
 
 Run:  python3 build_worker.py   ->  writes worker.js
@@ -37,9 +38,9 @@ const MONTH_NUM = {{ JANUARY:1, FEBRUARY:2, MARCH:3, APRIL:4, MAY:5, JUNE:6, JUL
 {parser_js}
 const CORS = {{ "access-control-allow-origin": "*" }};
 
-async function dataResponse(ctx) {{
+async function dataResponse(ctx, version) {{
   const cache = caches.default;
-  const cacheKey = new Request("https://internal-cache/data-v1");
+  const cacheKey = new Request("https://internal-cache/data-" + version);
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
   const upstream = await fetch(SHEET_CSV, {{ cf: {{ cacheTtl: 0 }} }});
@@ -48,7 +49,9 @@ async function dataResponse(ctx) {{
       status: 502, headers: {{ "content-type": "application/json", ...CORS }},
     }});
   }}
-  const rows = buildRows(await upstream.text());
+  let rows = buildRows(await upstream.text());
+  // v1 (legacy pages): month keys "YYYY-MM". v2: full dates "YYYY-MM-DD".
+  if (version === "v1") rows = rows.map(r => [r[0], r[1], r[2], r[3], r[4].slice(0, 7)]);
   const res = new Response(JSON.stringify({{ rows, fetchedAt: new Date().toISOString() }}), {{
     headers: {{
       "content-type": "application/json",
@@ -66,7 +69,7 @@ const PAGE = `{page}`;
 export default {{
   async fetch(request, env, ctx) {{
     const url = new URL(request.url);
-    if (url.pathname === "/data") return dataResponse(ctx);
+    if (url.pathname === "/data") return dataResponse(ctx, url.searchParams.get("v") === "2" ? "v2" : "v1");
     if (url.pathname !== "/") return new Response("Not found", {{ status: 404 }});
     return new Response(PAGE, {{
       headers: {{

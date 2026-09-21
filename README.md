@@ -1,7 +1,7 @@
 # Priceline & Expedia Dashboard
 
 Live dashboard of Expedia and Priceline review sentiment per check-out agent,
-grouped by location and filterable by month.
+grouped by location, filterable by any date range and by one or several locations.
 
 ## Architecture
 
@@ -12,8 +12,13 @@ grouped by location and filterable by month.
   `deploy.sh`) — serves the same page at `/` and aggregated counts at `/data`.
   It is the only place that knows the Google Sheet URL; raw sheet contents
   (complaint text, confirmation numbers) never leave the Worker. `/data`
-  returns only `[source, sentiment, agent, location, month]` tuples, cached
-  5 minutes.
+  returns only `[source, sentiment, agent, location, date]` tuples, cached
+  5 minutes. `/data?v=2` (used by the current page) carries full `YYYY-MM-DD`
+  dates built from the sheet's "Date of Complaint" + "YEAR" columns; the
+  legacy `/data` keeps returning `YYYY-MM` month keys for older copies of the page.
+- Design follows the Drivo brand palette (Navy `#091365`, Baby Blue `#0D1CA4`,
+  Yellow `#F3BB04`, White `#FBFBFB`, Black `#121212`). Sentiment colours:
+  positive = Baby Blue, neutral = Yellow, negative = Black.
 
 ## Not in the repo (gitignored)
 

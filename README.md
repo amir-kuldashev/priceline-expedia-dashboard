@@ -21,7 +21,7 @@ grouped by location, filterable by any date range and by one or several location
 - The page's **Duplicates** switch (Hide / Show, remembered per browser in
   `localStorage`) decides whether rows flagged `Duplicate? = Yes` are counted.
   It defaults to Hide, so each review is counted once.
-- Layout is fluid from ~320px phones to wide monitors: controls fill the row on
+- Layout spans the full viewport width, from ~320px phones to wide monitors: controls fill the row on
   tablets and stack on phones, popovers become bottom sheets under 640px, and
   the agent-name column scales with the viewport.
 - Design follows the Drivo brand palette (Navy `#091365`, Baby Blue `#0D1CA4`,

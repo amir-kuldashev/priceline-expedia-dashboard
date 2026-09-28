@@ -26,7 +26,7 @@ function parseCSV(text) {
 const MON3 = Object.fromEntries(Object.keys(MONTH_NUM).map(k => [k.slice(0, 3), MONTH_NUM[k]]));
 
 function buildRows(csvText) {
-  let iSrc = -1, iStars = -1, iAgent = -1, iLoc = -1, iMonth = -1, iYear = -1, iDate = -1;
+  let iSrc = -1, iStars = -1, iAgent = -1, iLoc = -1, iMonth = -1, iYear = -1, iDate = -1, iDup = -1;
   const out = [];
   const pad = n => String(n).padStart(2, "0");
   forEachCSVRow(csvText, (cells, idx) => {
@@ -39,6 +39,7 @@ function buildRows(csvText) {
       iMonth = headers.indexOf("MONTH");
       iYear = headers.indexOf("YEAR");
       iDate = headers.indexOf("DATE OF COMPLAINT");
+      iDup = headers.indexOf("DUPLICATE?");
       if (iSrc < 0 || iStars < 0 || iAgent < 0)
         throw new Error("Couldn't find the Source / Stars / Agent out columns");
       return;
@@ -60,7 +61,9 @@ function buildRows(csvText) {
       if (dmMonth) { mn = mn || dmMonth; day = parseInt(dm[1], 10); }
     }
     const dKey = (mn && yr) ? yr + "-" + pad(mn) + "-" + pad(day >= 1 && day <= 31 ? day : 1) : "0000-00-00";
-    out.push([src === "EXPEDIA" ? 0 : 1, stars >= 4 ? 0 : (stars === 3 ? 1 : 2), agent, loc, dKey]);
+    // "Duplicate?" is Yes/No (blank = not flagged); the page lets the viewer hide or show flagged rows.
+    const dup = iDup >= 0 && /^y/i.test((cells[iDup] || "").trim()) ? 1 : 0;
+    out.push([src === "EXPEDIA" ? 0 : 1, stars >= 4 ? 0 : (stars === 3 ? 1 : 2), agent, loc, dKey, dup]);
   });
   if (iSrc < 0) throw new Error("Sheet returned no data rows");
   if (!out.length) throw new Error("No Expedia or Priceline reviews found");

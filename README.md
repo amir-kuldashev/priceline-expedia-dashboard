@@ -12,10 +12,18 @@ grouped by location, filterable by any date range and by one or several location
   `deploy.sh`) — serves the same page at `/` and aggregated counts at `/data`.
   It is the only place that knows the Google Sheet URL; raw sheet contents
   (complaint text, confirmation numbers) never leave the Worker. `/data`
-  returns only `[source, sentiment, agent, location, date]` tuples, cached
-  5 minutes. `/data?v=2` (used by the current page) carries full `YYYY-MM-DD`
-  dates built from the sheet's "Date of Complaint" + "YEAR" columns; the
-  legacy `/data` keeps returning `YYYY-MM` month keys for older copies of the page.
+  returns only `[source, sentiment, agent, location, date, duplicate]` tuples,
+  cached 5 minutes. `/data?v=3` (used by the current page) carries full
+  `YYYY-MM-DD` dates built from the sheet's "Date of Complaint" + "YEAR"
+  columns plus a 0/1 flag from the sheet's "Duplicate?" column; `/data?v=2`
+  returns the same without the flag and the legacy `/data` keeps returning
+  `YYYY-MM` month keys, so older copies of the page keep working.
+- The page's **Duplicates** switch (Hide / Show, remembered per browser in
+  `localStorage`) decides whether rows flagged `Duplicate? = Yes` are counted.
+  It defaults to Hide, so each review is counted once.
+- Layout is fluid from ~320px phones to wide monitors: controls fill the row on
+  tablets and stack on phones, popovers become bottom sheets under 640px, and
+  the agent-name column scales with the viewport.
 - Design follows the Drivo brand palette (Navy `#091365`, Baby Blue `#0D1CA4`,
   Yellow `#F3BB04`, White `#FBFBFB`, Black `#121212`). Sentiment colours:
   positive = blue `#2F43D6`, neutral = pale blue-grey `#D9DCF0`, negative = coral `#F28B7D`

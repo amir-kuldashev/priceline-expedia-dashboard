@@ -8,8 +8,9 @@ Inputs:
   sheet_url.txt     - the private Google Sheet CSV URL (gitignored!)
 
 The sheet URL and raw CSV never reach the browser: /data returns only
-[source, sentiment-bucket, agent, location, date] tuples
-(/data?v=2 gives "YYYY-MM-DD"; the legacy /data gives "YYYY-MM"), with CORS open so
+[source, sentiment-bucket, agent, location, date, duplicate] tuples
+(/data?v=3 adds the 0/1 duplicate flag from the sheet's "Duplicate?" column;
+/data?v=2 gives 5-tuples with "YYYY-MM-DD"; the legacy /data gives "YYYY-MM"), with CORS open so
 the GitHub Pages copy of the dashboard can read it too.
 
 Run:  python3 build_worker.py   ->  writes worker.js
@@ -51,7 +52,9 @@ async function dataResponse(ctx, version) {{
   }}
   let rows = buildRows(await upstream.text());
   // v1 (legacy pages): month keys "YYYY-MM". v2: full dates "YYYY-MM-DD".
+  // v3 (current page): v2 plus a trailing 0/1 "Duplicate?" flag.
   if (version === "v1") rows = rows.map(r => [r[0], r[1], r[2], r[3], r[4].slice(0, 7)]);
+  else if (version === "v2") rows = rows.map(r => r.slice(0, 5));
   const res = new Response(JSON.stringify({{ rows, fetchedAt: new Date().toISOString() }}), {{
     headers: {{
       "content-type": "application/json",
@@ -69,7 +72,10 @@ const PAGE = `{page}`;
 export default {{
   async fetch(request, env, ctx) {{
     const url = new URL(request.url);
-    if (url.pathname === "/data") return dataResponse(ctx, url.searchParams.get("v") === "2" ? "v2" : "v1");
+    if (url.pathname === "/data") {{
+      const v = url.searchParams.get("v");
+      return dataResponse(ctx, v === "3" ? "v3" : (v === "2" ? "v2" : "v1"));
+    }}
     if (url.pathname !== "/") return new Response("Not found", {{ status: 404 }});
     return new Response(PAGE, {{
       headers: {{
